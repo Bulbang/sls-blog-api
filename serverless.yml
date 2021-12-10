@@ -10,39 +10,83 @@ provider:
   stage: dev
   region: us-east-1
 
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:GetItem
-        - dynamodb:Query
-        - dynamodb:Scan
-      Resource: !GetAtt DynamoDBTable.Arn
+  environment:
+    TABLE_NAME: ${self:custom.TableName}
+    REGION: ${self:provider.region}
+
 
 plugins:
   - serverless-webpack
+  - serverless-iam-roles-per-function
 
 functions:
   getArticles:
     handler: src/lambdas/getArticles/handler.getArticles
     events:
-      - httpApi:
+      - http:
           method: get
           path: /articles
-    environment:
-      TABLE_NAME: ${self:custom.TableName}
-      REGION: ${self:provider.region}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+        Resource: !GetAtt DynamoDBTable.Arn
+
   getArticle:
     handler: src/lambdas/getArticle/handler.getArticle
+
     events:
-      - httpApi:
+      - http:
           method: get
           path: /articles/{id}
-    environment:
-      TABLE_NAME: ${self:custom.TableName}
-      REGION: ${self:provider.region}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: !GetAtt DynamoDBTable.Arn
+
+  putArticle:
+    handler: src/lambdas/putArticle/handler.putArticle
+    events:
+      - http:
+          path: /articles/create
+          method: post
+          request:
+            schemas:
+              application/json: ${file(src/lambdas/putArticle/schema.json)}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: !GetAtt DynamoDBTable.Arn
+
+  updateArticle:
+    handler: src/lambdas/updateArticle/handler.updateArticle
+
+    events:
+      - http:
+          method: put
+          path: /articles/{id}
+          request:
+            parameters:
+              paths:
+                id: true
+            schemas:
+              application/json: ${file(src/lambdas/updateArticle/schema.json)}
+
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt DynamoDBTable.Arn
 
 custom:
   TableName: ${self:service}-${self:provider.stage}-table
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    packager: yarn
 
 resources:
   Resources:
