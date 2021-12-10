@@ -25,9 +25,8 @@ export const updateArticle: APIGatewayProxyHandler = async (event) => {
     };
   } catch (error) {
     return {
-      statusCode: 500,
+      statusCode: 400,
       body: JSON.stringify({
-        message: 'Internal server error',
         err: error,
       }),
     };

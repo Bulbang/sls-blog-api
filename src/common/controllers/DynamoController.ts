@@ -1,4 +1,4 @@
-import { forbidden, internal } from '@hapi/boom';
+import { badRequest, forbidden, internal } from '@hapi/boom';
 import CyrillicToTranslit from 'cyrillic-to-translit-js';
 import { v4 } from 'uuid';
 import { DBObjAttributes } from '../types/DBObjAttributes';
@@ -112,9 +112,9 @@ export class DynamoController {
         .promise();
       return res;
     } catch (error) {
-      throw internal(
+      throw badRequest(
         JSON.stringify({
-          message: 'Internal Server Error',
+          message: 'Bad Request',
           err: error,
         }),
       );
