@@ -1,34 +1,28 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
 import AWS from 'aws-sdk';
-import { DynamoController } from '../../common/controllers/DynamoController';
-import { Article } from '../../common/types/Article';
+import middy from 'middy';
+import { jsonBodyParser } from 'middy/middlewares';
+import { ArticleDynamoController } from '../../common/controllers/DynamoDB/ArticleDynamoController';
+import { ArticleReqBody } from '../../common/types/Article';
+import { ValidatedEventAPIGatewayProxyEvent } from '../../common/types/aws';
 
-export const updateArticle: APIGatewayProxyHandler = async (event) => {
-  try {
-    const dataToUpdate: Partial<Omit<Article, 'id' | 'slug'>> = JSON.parse(
-      event.body!,
-    );
-    const idOfArticleToUpdate = event.pathParameters!.id!;
-    const dbController = new DynamoController(
-      new AWS.DynamoDB.DocumentClient({
-        region: process.env.REGION!,
-      }),
-      process.env.TABLE_NAME!,
-    );
+const dynamodbClient = new AWS.DynamoDB.DocumentClient();
 
-    const res = await dbController.updateArticle(idOfArticleToUpdate, dataToUpdate);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        res,
-      }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        err: error,
-      }),
-    };
-  }
+const rawHandler: ValidatedEventAPIGatewayProxyEvent<Partial<ArticleReqBody>> = async (event) => {
+  const dataToUpdate = event.body;
+
+  const idOfArticleToUpdate = event.pathParameters!.id!;
+  const dbController = new ArticleDynamoController(
+    dynamodbClient,
+    process.env.TABLE_NAME!,
+  );
+
+  const res = await dbController.updateData(idOfArticleToUpdate, dataToUpdate);
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      res,
+    }),
+  };
 };
+
+export const updateArticle = middy(rawHandler).use(jsonBodyParser());

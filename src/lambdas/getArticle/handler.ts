@@ -1,17 +1,17 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import AWS from 'aws-sdk';
-import { DynamoController } from '../../common/controllers/DynamoController';
+import { ArticleDynamoController } from '../../common/controllers/DynamoDB/ArticleDynamoController';
+
+const dynamodbClient = new AWS.DynamoDB.DocumentClient();
 
 export const getArticle: APIGatewayProxyHandler = async (event) => {
   const id = event.pathParameters!.id!;
-  const dbController = new DynamoController(
-    new AWS.DynamoDB.DocumentClient({
-      region: process.env.REGION!,
-    }),
+  const dbController = new ArticleDynamoController(
+    dynamodbClient,
     process.env.TABLE_NAME!,
   );
 
-  const res = await dbController.getArticle(id);
+  const res = await dbController.getById(id);
   const item = res.Item;
 
   if (!item) {

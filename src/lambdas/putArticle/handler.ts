@@ -1,35 +1,26 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
 import AWS from 'aws-sdk';
-import { DynamoController } from '../../common/controllers/DynamoController';
-import { Article } from '../../common/types/Article';
+import middy from 'middy';
+import { jsonBodyParser } from 'middy/middlewares';
+import { ArticleDynamoController } from '../../common/controllers/DynamoDB/ArticleDynamoController';
+import { ArticleReqBody } from '../../common/types/Article';
+import { ValidatedEventAPIGatewayProxyEvent } from '../../common/types/aws';
 
-export const putArticle: APIGatewayProxyHandler = async (event) => {
-  try {
+const dynamodbClient = new AWS.DynamoDB.DocumentClient();
 
-    const article: Omit<Article, 'id' | 'slug'> = JSON.parse(
-        event.body!,
-      );
-    const dbController = new DynamoController(
-      new AWS.DynamoDB.DocumentClient({
-        region: process.env.REGION!,
-      }),
-      process.env.TABLE_NAME!,
-    );
+const rawHandler: ValidatedEventAPIGatewayProxyEvent<ArticleReqBody> = async (event) => {
+  const article = event.body;
 
-    const res = await dbController.putArticle(article);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        res,
-      }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'Internal server error',
-        err: error,
-      }),
-    };
-  }
+  const dbController = new ArticleDynamoController(
+    dynamodbClient,
+    process.env.TABLE_NAME!,
+  );
+  const res = await dbController.putData(article);
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      res,
+    }),
+  };
 };
+
+export const putArticle = middy(rawHandler).use(jsonBodyParser());
