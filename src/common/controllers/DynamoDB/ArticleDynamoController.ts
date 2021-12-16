@@ -37,7 +37,7 @@ export class ArticleDynamoController extends DynamoController {
 
     try {
       for (const [key, val] of Object.entries(updateValues)) {
-        if (key === 'id' || key === 'slug') {
+        if (key === 'id' || key === 'slug' || key === 'lastUpdate' || key === 'created') {
           throw forbidden(`Key: '${key}' unable to update`);
         }
         updateEx += `${key}=:atr${index}, `;
