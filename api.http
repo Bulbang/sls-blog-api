@@ -1,0 +1,29 @@
+### Get array of all articles (article: {id:string, title:string})
+GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles
+
+### Get article by id (article: {content:string, meta_title: string, created: number, slug: string, id:string, lastUpdate: number, meta_description: string, title: string})
+GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/:id
+
+### Post new article (encodedString = base64(login:password))
+POST https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/create
+Authorization: Basic <encodedString>
+Content-Type: application/json
+
+{
+    "title": "abcdefghigklmnop",
+    "meta_title": "qwerty228",
+    "meta_description": "metaqwerty322",
+    "content": "contentqweadsfbdnty321"
+}
+
+### Change article by id (encodedString = base64(login:password), properties in body is optional, but at least one required)
+PUT https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/:id
+Authorization: Basic <encodedString>
+Content-Type: application/json
+
+{
+    "title": "abcdefghigklmnop",
+    "meta_title": "qwerty228",
+    "meta_description": "metaqwerty322",
+    "content": "contentqweadsfbdnty321"
+}
