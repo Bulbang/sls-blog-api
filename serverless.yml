@@ -20,7 +20,7 @@ plugins:
 
 functions:
   getArticles:
-    handler: src/lambdas/getArticles/handler.getArticles
+    handler: src/lambdas/getArticles/handler.getAllArticles
     events:
       - http:
           method: get

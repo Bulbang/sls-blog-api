@@ -2,27 +2,27 @@
 GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles
 
 ### Get article by id (article: {content:string, meta_title: string, created: number, slug: string, id:string, lastUpdate: number, meta_description: string, title: string})
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/:id
+GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/e8ace861-37b0-4baf-9aea-97ff5dd5af99
 
 ### Post new article (encodedString = base64(login:password))
 POST https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/create
-Authorization: Basic <encodedString>
+Authorization: Basic YWRtaW46cXdlcnR5MTIz
 Content-Type: application/json
 
 {
-    "title": "abcdefghigklmnop",
-    "meta_title": "qwerty228",
-    "meta_description": "metaqwerty322",
-    "content": "contentqweadsfbdnty321"
+    "title": "asdfdfd",
+    "meta_title": "qwevhgfxrty212458",
+    "meta_description": "metacsdvaqweqwrty322222",
+    "content": "contentqweadfhsfbvsdfdnty311121"
 }
 
 ### Change article by id (encodedString = base64(login:password), properties in body is optional, but at least one required)
-PUT https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/:id
-Authorization: Basic <encodedString>
+PUT https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/b67dc2ac-fb2e-4cee-bca4-c05206666e28
+Authorization: Basic YWRtaW46cXdlcnR5MTIz
 Content-Type: application/json
 
 {
-    "title": "abcdefghigklmnop",
+    "title": "abcdsafsgfsdgdsefghigklmnop",
     "meta_title": "qwerty228",
     "meta_description": "metaqwerty322",
     "content": "contentqweadsfbdnty321"
