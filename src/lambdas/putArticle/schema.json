@@ -11,7 +11,11 @@
       "meta_description": {
         "type": "string"
       },
+
       "content": {
+        "type": "string"
+      },
+      "mime_type": {
         "type": "string"
       }
     },
@@ -19,6 +23,7 @@
       "title",
       "meta_title",
       "meta_description",
-      "content"
+      "content",
+      "mime_type"
     ]
   }

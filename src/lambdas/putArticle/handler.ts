@@ -2,7 +2,7 @@ import AWS from "aws-sdk";
 import middy from "middy";
 import { jsonBodyParser } from "middy/middlewares";
 import { ArticleDynamoRepository } from "../../common/controllers/DynamoDB/ArticleDynamoRepository";
-import { Article, ArticleReqBody } from "../../common/types/article";
+import { Article, ArticleReqBody, Response } from "../../common/types/article";
 import {
   ResponseTypedAPIGatewayProxyHandler,
   ValidatedEventBody,
@@ -14,30 +14,32 @@ import {
 import { responseParser } from "../../middlewares/responseParser";
 
 const dynamodbClient = new AWS.DynamoDB.DocumentClient();
+const s3 = new AWS.S3();
 
 const rawHandler: ResponseTypedAPIGatewayProxyHandler<
   ValidatedEventBody<ArticleReqBody>,
-  okResponse<Article> | errorResponse
+  okResponse<Response>
 > = async (event) => {
-  try {
-    const { content, title, meta_description, meta_title } = event.body;
+  const { content, title, meta_description, meta_title, mime_type } =
+    event.body;
 
-    const article = { title, meta_title, meta_description, content };
-    const dbController = new ArticleDynamoRepository(
-      dynamodbClient,
-      process.env.TABLE_NAME!
-    );
-    const res = await dbController.putData(article);
-    return okResponse(res);
-  } catch (e) {
-    return errorResponse(e.statusCode, {
-      error: {
-        type: e.type,
-        status: e.output.payload.error,
-        message: e.output.statusCode === 500 ? undefined : e.message,
-      },
-    });
-  }
+  const article = { title, meta_title, meta_description, content, mime_type };
+  const dbController = new ArticleDynamoRepository(
+    dynamodbClient,
+    process.env.TABLE_NAME!
+  );
+  const dbRes = await dbController.putData(article);
+
+  const fileName = `${dbRes.id}.${mime_type.split("/")[1]}`;
+  const contentType = dbRes.mime_type;
+
+  const uploadS3Url = await s3.getSignedUrlPromise("putObject", {
+    Bucket: process.env.BUCKET_NAME!,
+    Key: fileName,
+    ContentType: contentType,
+  });
+  const res: Response = { ...dbRes, url: uploadS3Url, file_name: fileName };
+  return okResponse(res);
 };
 
 export const putArticle = middy(rawHandler)

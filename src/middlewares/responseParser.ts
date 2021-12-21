@@ -3,6 +3,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { MiddlewareObject } from "middy";
 import { cors } from "middy/middlewares";
 import { TypedResponseBody } from "../common/types/aws";
+import { errorResponse } from "../common/types/Responce/baseResponses";
 import { APIGatewayResponseClass } from "../common/types/Responce/ResponseClass";
 
 export const responseParser = <TEvent>(): MiddlewareObject<
@@ -19,6 +20,30 @@ export const responseParser = <TEvent>(): MiddlewareObject<
           body: handler.response.body,
         }).toJSON();
       } else handler.response.toJSON();
+
+      cors().after?.(handler, next);
+    },
+    onError: (handler, next) => {
+      console.error(handler.error);
+
+      let error: any;
+      if (isBoom(handler.error)) {
+        error = handler.error;
+      } else {
+        error = internal(handler.error.message);
+        error.name = "InternalError";
+      }
+
+      handler.response = new APIGatewayResponseClass(errorResponse(error.output.statusCode, {
+        err: {
+          type: error.type,
+          status: error.output.payload.error,
+          message: error.output.statusCode === 500 ? undefined : error.message,
+        },
+      })
+      );
+
+      delete handler.error;
 
       cors().after?.(handler, next);
     },

@@ -2,7 +2,7 @@
 GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles
 
 ### Get article by id (article: {content:string, meta_title: string, created: number, slug: string, id:string, lastUpdate: number, meta_description: string, title: string})
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/e8ace861-37b0-4baf-9aea-97ff5dd5af99
+GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/e8ace861-37s2-4saf-9aea-97ff5dd5af99
 
 ### Post new article (encodedString = base64(login:password))
 POST https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/create
@@ -13,7 +13,8 @@ Content-Type: application/json
     "title": "asdfdfd",
     "meta_title": "qwevhgfxrty212458",
     "meta_description": "metacsdvaqweqwrty322222",
-    "content": "contentqweadfhsfbvsdfdnty311121"
+    "content": "contentqweadfhsfbvsdfdnty311121",
+    "mime_type": "image/jpeg"
 }
 
 ### Change article by id (encodedString = base64(login:password), properties in body is optional, but at least one required)

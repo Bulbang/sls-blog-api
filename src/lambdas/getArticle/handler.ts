@@ -14,28 +14,17 @@ const dynamodbClient = new AWS.DynamoDB.DocumentClient();
 
 const rawHandler: ResponseTypedAPIGatewayProxyHandler<
   APIGatewayProxyEvent,
-  okResponse<Article> | errorResponse
+  okResponse<Article>
 > = async (event) => {
-  try {
-    const id = event.pathParameters!.id!;
-    const dbController = new ArticleDynamoRepository(
-      dynamodbClient,
-      process.env.TABLE_NAME!
-    );
+  const id = event.pathParameters!.id!;
+  const dbController = new ArticleDynamoRepository(
+    dynamodbClient,
+    process.env.TABLE_NAME!
+  );
 
-    const res = await dbController.getById(id);
+  const res = await dbController.getById(id);
 
-    return okResponse<Article>(res);
-  } catch (e) {
-    console.log(e);
-    
-    return errorResponse(e.output.statusCode, {
-      error: {
-        status: e.output.payload.error,
-        message: e.output.statusCode === 500 ? undefined : e.output.payload.message,
-      },
-    });
-  }
+  return okResponse<Article>(res);
 };
 
 export const getArticle = middy(rawHandler).use(

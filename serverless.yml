@@ -13,6 +13,7 @@ provider:
   environment:
     TABLE_NAME: ${self:custom.TableName}
     REGION: ${self:provider.region}
+    BUCKET_NAME: ${self:custom.BucketName}
 
 plugins:
   - serverless-webpack
@@ -25,6 +26,7 @@ functions:
       - http:
           method: get
           path: /articles
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -37,6 +39,7 @@ functions:
       - http:
           method: get
           path: /articles/{id}
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -49,6 +52,7 @@ functions:
       - http:
           path: /articles/create
           method: post
+          cors: true
           request:
             schemas:
               application/json: ${file(src/lambdas/putArticle/schema.json)}
@@ -62,6 +66,10 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: !GetAtt DynamoDBTable.Arn
+      - Effect:  Allow
+        Action:
+          - s3:*
+        Resource: !GetAtt ImageBucket.Arn
 
   updateArticle:
     handler: src/lambdas/updateArticle/handler.updateArticle
@@ -69,6 +77,7 @@ functions:
       - http:
           method: put
           path: /articles/{id}
+          cors: true
           request:
             parameters:
               paths:
@@ -95,6 +104,7 @@ functions:
 custom:
   TableName: ${self:service}-${self:provider.stage}-table
   AdminsTableName: ${self:service}-${self:provider.stage}-admins-table
+  BucketName: ${self:service}-${self:provider.stage}-image-bucket
 
   webpack:
     webpackConfig: webpack.config.js
@@ -103,6 +113,24 @@ custom:
 
 resources:
   Resources:
+    ImageBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: citizen-trader-images-${self:custom.BucketName}
+        AccessControl: PublicReadWrite
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+          - AllowedMethods:
+            - GET
+            - PUT
+            - POST
+            - HEAD
+
     DynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
