@@ -1,11 +1,11 @@
 ### Get array of all articles (article: {id:string, title:string})
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles
+GET https://a01k4rm4w1.execute-api.us-east-1.amazonaws.com/front-dev/articles
 
 ### Get article by id (article: {content:string, meta_title: string, created: number, slug: string, id:string, lastUpdate: number, meta_description: string, title: string})
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/e8ace861-37b0-4baf-9aea-97ff5dd5af99
+GET https://a01k4rm4w1.execute-api.us-east-1.amazonaws.com/front-dev/articles/:id
 
 ### Post new article (encodedString = base64(login:password))
-POST https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/create
+POST https://a01k4rm4w1.execute-api.us-east-1.amazonaws.com/front-dev/articles/create
 Authorization: Basic YWRtaW46cXdlcnR5MTIz
 Content-Type: application/json
 
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### Change article by id (encodedString = base64(login:password), properties in body is optional, but at least one required)
-PUT https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/b67dc2ac-fb2e-4cee-bca4-c05206666e28
+PUT https://a01k4rm4w1.execute-api.us-east-1.amazonaws.com/front-dev/articles/:id
 Authorization: Basic YWRtaW46cXdlcnR5MTIz
 Content-Type: application/json
 
