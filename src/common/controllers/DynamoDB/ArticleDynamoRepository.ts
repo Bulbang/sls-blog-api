@@ -1,8 +1,10 @@
-import { badData, forbidden, internal, notFound } from "@hapi/boom";
-import CyrillicToTranslit from "cyrillic-to-translit-js";
-import { v4 } from "uuid";
-import { Article, ArticleReqBody, TrimmedArticle } from "../../types/article";
-import { DynamoController as DynamoRepository } from "../../abstractions/DynamoRepository";
+import {
+  badData, forbidden, internal, notFound,
+} from '@hapi/boom';
+import CyrillicToTranslit from 'cyrillic-to-translit-js';
+import { v4 } from 'uuid';
+import { Article, ArticleReqBody, TrimmedArticle } from '../../types/article';
+import { DynamoController as DynamoRepository } from '../../abstractions/DynamoRepository';
 
 export class ArticleDynamoRepository extends DynamoRepository {
   public async getMany(): Promise<TrimmedArticle[]> {
@@ -14,18 +16,25 @@ export class ArticleDynamoRepository extends DynamoRepository {
         })
         .promise();
     } catch (error) {
-      throw internal("DynamoDB scan operation error: ", error);
+      throw internal('DynamoDB scan operation error: ', error);
     }
 
     if (!data.Items) {
-      throw notFound("Items not found");
+      throw notFound('Items not found');
     }
     const articles: TrimmedArticle[] = data.Items.map((item: Article) => {
-      const { id, slug, title } = item;
-      if (id || slug || title) {
-        return { id, slug, title };
+      const {
+        id, slug, title, url,
+      } = item;
+      if (id || slug || title || url) {
+        return {
+          id,
+          slug,
+          title,
+          url,
+        };
       }
-      throw internal("One of properties is invalid");
+      throw internal('One of properties is invalid');
     });
     return articles;
   }
@@ -40,7 +49,7 @@ export class ArticleDynamoRepository extends DynamoRepository {
         })
         .promise();
     } catch (error) {
-      throw internal("DynamoDB get operation error: ", error);
+      throw internal('DynamoDB get operation error: ', error);
     }
 
     if (!data.Item) {
@@ -55,17 +64,21 @@ export class ArticleDynamoRepository extends DynamoRepository {
       content: data.Item.content,
       created_at: data.Item.created_at,
       updated_at: data.Item.updated_at,
+      file_id: data.Item.file_id,
+      url: data.Item.url,
     };
     return article;
   }
 
-  public async putData(article: ArticleReqBody): Promise<Article> {
+  public async putData(
+    article: ArticleReqBody & { url: string },
+  ): Promise<Article> {
     try {
       const newArticle: Article = {
         id: v4(),
         slug: new CyrillicToTranslit().transform(
           article.title.toLowerCase(),
-          "_"
+          '_',
         ),
         ...article,
         created_at: +new Date(),
@@ -80,34 +93,35 @@ export class ArticleDynamoRepository extends DynamoRepository {
 
       return newArticle;
     } catch (error) {
-      throw internal("DynamoDB put operation error: ", error);
+      throw internal('DynamoDB put operation error: ', error);
     }
   }
 
   public async updateData(
     id: string,
-    updateValues: Partial<ArticleReqBody>
+    updateValues: Partial<ArticleReqBody>,
   ): Promise<Article> {
-    let updateEx = "set ";
-    const atrUpdate: { [key: string]: unknown } = { ":date": +new Date() };
+    let updateEx = 'set ';
+    const atrUpdate: { [key: string]: unknown } = { ':date': +new Date() };
     let index = 0;
 
     try {
       for (const [key, val] of Object.entries(updateValues)) {
         if (
-          key === "id" ||
-          key === "slug" ||
-          key === "updated_at" ||
-          key === "created_at"
+          key === 'id'
+          || key === 'slug'
+          || key === 'updated_at'
+          || key === 'created_at'
+          || key === 'url' || key === "file_id"
         ) {
           throw forbidden(`Key: '${key}' unable to update`);
-        }
+        } 
         updateEx += `${key}=:atr${index}, `;
         atrUpdate[`:atr${index}`] = val;
         index += 1;
       }
-      updateEx += "updated_at=:date, ";
-      atrUpdate[":date"] = +new Date();
+      updateEx += 'updated_at=:date, ';
+      atrUpdate[':date'] = +new Date();
     } catch (error) {
       throw badData(error);
     }
@@ -121,15 +135,15 @@ export class ArticleDynamoRepository extends DynamoRepository {
           TableName: this.tableName,
           UpdateExpression: updateEx,
           ExpressionAttributeValues: atrUpdate,
-          ReturnValues: "ALL_NEW",
+          ReturnValues: 'ALL_NEW',
         })
         .promise();
     } catch (error) {
-      throw internal("DynamoDB update operation error: ", error);
+      throw internal('DynamoDB update operation error: ', error);
     }
 
     if (!res.Attributes) {
-      throw internal();
+      throw internal('Atributes empty');
     }
 
     const article: Article = {
@@ -141,6 +155,8 @@ export class ArticleDynamoRepository extends DynamoRepository {
       content: res.Attributes!.content,
       created_at: res.Attributes!.created_at,
       updated_at: res.Attributes!.updated_at,
+      file_id: res.Attributes!.file_id,
+      url: res.Attributes!.url,
     };
     return article;
   }

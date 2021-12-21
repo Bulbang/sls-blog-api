@@ -1,34 +1,34 @@
-import AWS from "aws-sdk";
-import middy from "middy";
-import { jsonBodyParser } from "middy/middlewares";
-import { ArticleDynamoRepository } from "../../common/controllers/DynamoDB/ArticleDynamoRepository";
-import { Article, ArticleReqBody } from "../../common/types/article";
+import AWS from 'aws-sdk';
+import middy from 'middy';
+import { jsonBodyParser } from 'middy/middlewares';
+import { ArticleDynamoRepository } from '../../common/controllers/DynamoDB/ArticleDynamoRepository';
+import { Article, ArticleReqBody } from '../../common/types/article';
 import {
   ResponseTypedAPIGatewayProxyHandler,
   ValidatedEventBody,
-} from "../../common/types/aws";
+} from '../../common/types/aws';
 import {
-  errorResponse,
-  okResponse,
-} from "../../common/types/Responce/baseResponses";
-import { responseParser } from "../../middlewares/responseParser";
+
+  OkResponse,
+} from '../../common/types/Responce/baseResponses';
+import { responseParser } from '../../middlewares/responseParser';
 
 const dynamodbClient = new AWS.DynamoDB.DocumentClient();
 
 const rawHandler: ResponseTypedAPIGatewayProxyHandler<
-  ValidatedEventBody<Partial<ArticleReqBody>>,
-  okResponse<Article>
+ValidatedEventBody<Partial<ArticleReqBody>>,
+OkResponse<Article>
 > = async (event) => {
   const dataToUpdate = event.body;
 
   const idOfArticleToUpdate = event.pathParameters!.id!;
   const dbController = new ArticleDynamoRepository(
     dynamodbClient,
-    process.env.TABLE_NAME!
+    process.env.TABLE_NAME!,
   );
 
   const res = await dbController.updateData(idOfArticleToUpdate, dataToUpdate);
-  return okResponse(res);
+  return OkResponse(res);
 };
 
 export const updateArticle = middy(rawHandler)

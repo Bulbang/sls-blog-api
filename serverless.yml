@@ -14,6 +14,7 @@ provider:
     TABLE_NAME: ${self:custom.TableName}
     REGION: ${self:provider.region}
     BUCKET_NAME: ${self:custom.BucketName}
+    
 
 plugins:
   - serverless-webpack
@@ -66,10 +67,6 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: !GetAtt DynamoDBTable.Arn
-      - Effect:  Allow
-        Action:
-          - s3:*
-        Resource: !GetAtt ImageBucket.Arn
 
   updateArticle:
     handler: src/lambdas/updateArticle/handler.updateArticle
@@ -94,7 +91,20 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: !GetAtt DynamoDBTable.Arn
+  getPresignUrl: 
+    handler: src/lambdas/getPresignUrl/handler.getPresignUrl
+    events:
+      - http:
+          path: /getPresignUrl
+          method: get
+          cors: true
 
+    iamRoleStatements:
+      - Effect:  Allow
+        Action:
+          - s3:*
+        Resource: !Join ["/",[!GetAtt ImageBucket.Arn, "*"]]
+      
   auth:
     handler: src/lambdas/auth/handler.auth
     environment:
@@ -116,7 +126,7 @@ resources:
     ImageBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: citizen-trader-images-${self:custom.BucketName}
+        BucketName: ${self:custom.BucketName}
         AccessControl: PublicReadWrite
         PublicAccessBlockConfiguration:
           BlockPublicAcls: false
@@ -126,10 +136,11 @@ resources:
         CorsConfiguration:
           CorsRules:
           - AllowedMethods:
-            - GET
-            - PUT
-            - POST
-            - HEAD
+              - GET
+              - PUT
+            AllowedOrigins:
+              - '*'
+
 
     DynamoDBTable:
       Type: AWS::DynamoDB::Table
@@ -142,14 +153,4 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-    AdminsDynamoDBTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.AdminsTableName}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+

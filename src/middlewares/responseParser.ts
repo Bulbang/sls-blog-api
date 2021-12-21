@@ -1,16 +1,14 @@
-import { internal, isBoom } from "@hapi/boom";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { MiddlewareObject } from "middy";
-import { cors } from "middy/middlewares";
-import { TypedResponseBody } from "../common/types/aws";
-import { errorResponse } from "../common/types/Responce/baseResponses";
-import { APIGatewayResponseClass } from "../common/types/Responce/ResponseClass";
+import { internal, isBoom } from '@hapi/boom';
+import { MiddlewareObject } from 'middy';
+import { cors } from 'middy/middlewares';
+import { TypedResponseBody } from '../common/types/aws';
+import { ErrorResponse } from '../common/types/Responce/baseResponses';
+import { APIGatewayResponseClass } from '../common/types/Responce/ResponseClass';
 
 export const responseParser = <TEvent>(): MiddlewareObject<
-  TEvent,
-  TypedResponseBody<any>
-> => {
-  return {
+TEvent,
+TypedResponseBody<any>
+> => ({
     after: (handler, next) => {
       if (!(handler.response instanceof APIGatewayResponseClass)) {
         handler.response = new APIGatewayResponseClass<any>({
@@ -31,21 +29,18 @@ export const responseParser = <TEvent>(): MiddlewareObject<
         error = handler.error;
       } else {
         error = internal(handler.error.message);
-        error.name = "InternalError";
+        error.name = 'InternalError';
       }
 
-      handler.response = new APIGatewayResponseClass(errorResponse(error.output.statusCode, {
+      handler.response = new APIGatewayResponseClass(ErrorResponse(error.output.statusCode, {
         err: {
-          type: error.type,
           status: error.output.payload.error,
           message: error.output.statusCode === 500 ? undefined : error.message,
         },
-      })
-      );
+      }));
 
       delete handler.error;
 
       cors().after?.(handler, next);
     },
-  };
-};
+  });
