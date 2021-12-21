@@ -24,6 +24,7 @@ functions:
     events:
       - http:
           method: get
+          cors: true
           path: /articles
     iamRoleStatements:
       - Effect: Allow
@@ -36,6 +37,7 @@ functions:
     events:
       - http:
           method: get
+          cors: true
           path: /articles/{id}
     iamRoleStatements:
       - Effect: Allow
@@ -48,6 +50,7 @@ functions:
     events:
       - http:
           path: /articles/create
+          cors: true
           method: post
           request:
             schemas:
@@ -68,6 +71,7 @@ functions:
     events:
       - http:
           method: put
+          cors: true
           path: /articles/{id}
           request:
             parameters:
