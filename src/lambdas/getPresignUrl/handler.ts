@@ -15,7 +15,7 @@ APIGatewayProxyEvent,
 OkResponse<{ url: string; fields: { [key: string]: unknown } }>
 > = async (event) => {
     const fileName = event.queryStringParameters?.fileId
-        ? event.queryStringParameters.fileName
+        ? event.queryStringParameters.fileId
         : v4();
     const res = s3.createPresignedPost({
         Bucket: process.env.BUCKET_NAME,

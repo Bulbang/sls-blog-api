@@ -1,5 +1,5 @@
 service: blog-api
-
+useDotenv: true
 frameworkVersion: "2"
 
 provider:
@@ -12,7 +12,6 @@ provider:
 
   environment:
     TABLE_NAME: ${self:custom.TableName}
-    REGION: ${self:provider.region}
     BUCKET_NAME: ${self:custom.BucketName}
 
 plugins:
@@ -106,6 +105,9 @@ functions:
 
   auth:
     handler: src/lambdas/auth/handler.auth
+    environment:
+      LOGIN: ${env:LOGIN}
+      PASSWORD: ${env:PASSWORD}
 
 custom:
   TableName: ${self:service}-${self:provider.stage}-table
