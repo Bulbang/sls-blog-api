@@ -20,7 +20,7 @@ GET https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles
 #   file_id: string,
 #   url: string 
 # }
-GET https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles:id
+GET https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles/:id
 
 ### Post new article
 ### All properties in request body required

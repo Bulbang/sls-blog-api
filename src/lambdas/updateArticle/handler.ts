@@ -16,7 +16,7 @@ import { responseParser } from '../../middlewares/responseParser';
 const dynamodbClient = new AWS.DynamoDB.DocumentClient();
 
 const rawHandler: ResponseTypedAPIGatewayProxyHandler<
-ValidatedEventBody<Partial<ArticleReqBody>>,
+ValidatedEventBody<Partial<Omit<ArticleReqBody, 'file_id'>>>,
 OkResponse<Article>
 > = async (event) => {
     const dataToUpdate = event.body;
