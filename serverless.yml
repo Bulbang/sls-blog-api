@@ -1,5 +1,5 @@
 service: blog-api
-
+useDotenv: true
 frameworkVersion: "2"
 
 provider:
@@ -12,7 +12,7 @@ provider:
 
   environment:
     TABLE_NAME: ${self:custom.TableName}
-    REGION: ${self:provider.region}
+    BUCKET_NAME: ${self:custom.BucketName}
 
 plugins:
   - serverless-webpack
@@ -26,6 +26,7 @@ functions:
           method: get
           cors: true
           path: /articles
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -39,6 +40,7 @@ functions:
           method: get
           cors: true
           path: /articles/{id}
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -52,6 +54,7 @@ functions:
           path: /articles/create
           cors: true
           method: post
+          cors: true
           request:
             schemas:
               application/json: ${file(src/lambdas/putArticle/schema.json)}
@@ -73,6 +76,7 @@ functions:
           method: put
           cors: true
           path: /articles/{id}
+          cors: true
           request:
             parameters:
               paths:
@@ -89,16 +93,30 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: !GetAtt DynamoDBTable.Arn
+  getPresignUrl:
+    handler: src/lambdas/getPresignUrl/handler.getPresignUrl
+    events:
+      - http:
+          path: /getPresignUrl
+          method: get
+          cors: true
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:*
+        Resource: !Join ["/", [!GetAtt ImageBucket.Arn, "*"]]
 
   auth:
     handler: src/lambdas/auth/handler.auth
     environment:
-      LOGIN: admin
-      PASSWORD: qwerty123
+      LOGIN: ${env:LOGIN}
+      PASSWORD: ${env:PASSWORD}
 
 custom:
   TableName: ${self:service}-${self:provider.stage}-table
   AdminsTableName: ${self:service}-${self:provider.stage}-admins-table
+  BucketName: ${self:service}-${self:provider.stage}-image-bucket
 
   webpack:
     webpackConfig: webpack.config.js
@@ -107,21 +125,28 @@ custom:
 
 resources:
   Resources:
+    ImageBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.BucketName}
+        AccessControl: PublicReadWrite
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+              AllowedOrigins:
+                - "*"
+
     DynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.TableName}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-    AdminsDynamoDBTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.AdminsTableName}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id

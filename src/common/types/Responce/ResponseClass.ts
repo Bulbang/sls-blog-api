@@ -23,6 +23,7 @@ export class APIGatewayResponseClass<TBody> {
         this.headers = headers;
         this.isBase64Encoded = isBase64Encoded;
     }
+
     props() {
         return {
             statusCode: this.statusCode,
@@ -31,6 +32,7 @@ export class APIGatewayResponseClass<TBody> {
             isBase64Encoded: this.isBase64Encoded,
         };
     }
+
     toJSON() {
         return {
             statusCode: this.statusCode,

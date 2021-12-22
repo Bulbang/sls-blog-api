@@ -18,10 +18,11 @@
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^4.29.3",
     "@typescript-eslint/parser": "^4.29.3",
+    "aws-sdk": "^2.1048.0",
     "eslint": "^7.2.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^14.0.1",
-    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-import": "^2.25.3",
     "inquirer": "^8.0.0",
     "serverless": "^2.23.0",
     "serverless-iam-roles-per-function": "^3.2.0",
@@ -34,7 +35,6 @@
   },
   "dependencies": {
     "@hapi/boom": "^9.1.4",
-    "aws-sdk": "^2.1037.0",
     "cyrillic-to-translit-js": "^3.1.0",
     "middy": "^0.36.0",
     "uuid": "^8.3.2"
