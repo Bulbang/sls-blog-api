@@ -44,7 +44,7 @@ Content-Type: application/json
 # encodedString = base64(login:password)
 PUT https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles/:id
 >>>>>>> dev
-Authorization: Basic YWRtaW46cXdlcnR5MTIz
+Authorization: Basic <encodedString>
 Content-Type: application/json
 
 {
