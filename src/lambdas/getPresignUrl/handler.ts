@@ -4,7 +4,7 @@ import middy from 'middy';
 import { v4 } from 'uuid';
 import { ResponseTypedAPIGatewayProxyHandler } from '../../common/types/aws';
 import {
-  OkResponse,
+    OkResponse,
 } from '../../common/types/Responce/baseResponses';
 import { responseParser } from '../../middlewares/responseParser';
 
@@ -14,23 +14,23 @@ const rawHandler: ResponseTypedAPIGatewayProxyHandler<
 APIGatewayProxyEvent,
 OkResponse<{ url: string; fields: { [key: string]: unknown } }>
 > = async (event) => {
-  const fileName = event.queryStringParameters?.fileId
-    ? event.queryStringParameters.fileName
-    : v4();
-  const res = s3.createPresignedPost({
-    Bucket: process.env.BUCKET_NAME,
-    Fields: {
-      acl: 'public-read',
-      key: fileName,
-    },
-    Conditions: [
-      ['starts-with', '$Content-Type', 'image/'],
-      ['content-length-range', 0, 10000000],
-    ],
-  });
-  return OkResponse(res);
+    const fileName = event.queryStringParameters?.fileId
+        ? event.queryStringParameters.fileName
+        : v4();
+    const res = s3.createPresignedPost({
+        Bucket: process.env.BUCKET_NAME,
+        Fields: {
+            acl: 'public-read',
+            key: fileName,
+        },
+        Conditions: [
+            ['starts-with', '$Content-Type', 'image/'],
+            ['content-length-range', 0, 10000000],
+        ],
+    });
+    return OkResponse(res);
 };
 
 export const getPresignUrl = middy(rawHandler).use(
-  responseParser<APIGatewayProxyEvent>(),
+    responseParser<APIGatewayProxyEvent>(),
 );

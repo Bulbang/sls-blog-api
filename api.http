@@ -4,7 +4,7 @@
 #   title:string, 
 #   url: string
 # }
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles
+GET https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles
 
 
 ### Get article by id 
@@ -20,12 +20,12 @@ GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles
 #   file_id: string,
 #   url: string 
 # }
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/:id
+GET https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles:id
 
 ### Post new article
 ### All properties in request body required
 # encodedString = base64(login:password)
-POST https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/create
+POST https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles/create
 Authorization: Basic <encodedString>
 Content-Type: application/json
 
@@ -41,7 +41,7 @@ Content-Type: application/json
 # Properties in body is optional, but at least one required
 # encodedString = base64(login:password)
 
-PUT https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/articles/:id
+PUT https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/articles/:id
 Authorization: Basic YWRtaW46cXdlcnR5MTIz
 Content-Type: application/json
 
@@ -68,4 +68,4 @@ Content-Type: application/json
 #         "X-Amz-Signature": string
 #     }
 # }
-GET https://x03xdh6x33.execute-api.us-east-1.amazonaws.com/dev/getPresignUrl
+GET https://l5200snew6.execute-api.us-east-1.amazonaws.com/front-dev-1/getPresignUrl

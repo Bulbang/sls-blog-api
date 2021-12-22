@@ -1,14 +1,14 @@
 export type Article = {
-  id: string;
-  slug: string;
-  title: string;
-  meta_title: string;
-  meta_description: string;
-  content: string;
-  created_at: number;
-  updated_at: number;
-  file_id: string;
-  url: string;
+    id: string;
+    slug: string;
+    title: string;
+    meta_title: string;
+    meta_description: string;
+    content: string;
+    created_at: number;
+    updated_at: number;
+    file_id: string;
+    url: string;
 };
 
 export type ArticleReqBody = Omit<

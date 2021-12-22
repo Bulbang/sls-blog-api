@@ -7,14 +7,13 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
 
-  stage: dev
+  stage: ${opt:stage, 'dev'}
   region: us-east-1
 
   environment:
     TABLE_NAME: ${self:custom.TableName}
     REGION: ${self:provider.region}
     BUCKET_NAME: ${self:custom.BucketName}
-    
 
 plugins:
   - serverless-webpack
@@ -91,7 +90,7 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: !GetAtt DynamoDBTable.Arn
-  getPresignUrl: 
+  getPresignUrl:
     handler: src/lambdas/getPresignUrl/handler.getPresignUrl
     events:
       - http:
@@ -100,11 +99,11 @@ functions:
           cors: true
 
     iamRoleStatements:
-      - Effect:  Allow
+      - Effect: Allow
         Action:
           - s3:*
-        Resource: !Join ["/",[!GetAtt ImageBucket.Arn, "*"]]
-      
+        Resource: !Join ["/", [!GetAtt ImageBucket.Arn, "*"]]
+
   auth:
     handler: src/lambdas/auth/handler.auth
     environment:
@@ -135,12 +134,11 @@ resources:
           RestrictPublicBuckets: false
         CorsConfiguration:
           CorsRules:
-          - AllowedMethods:
-              - GET
-              - PUT
-            AllowedOrigins:
-              - '*'
-
+            - AllowedMethods:
+                - GET
+                - PUT
+              AllowedOrigins:
+                - "*"
 
     DynamoDBTable:
       Type: AWS::DynamoDB::Table
@@ -153,4 +151,3 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-

@@ -1,14 +1,14 @@
 import {
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  Handler,
+    APIGatewayProxyEvent,
+    APIGatewayProxyResult,
+    Handler,
 } from 'aws-lambda';
 
 export type ValidatedEventBody<S> = Omit<APIGatewayProxyEvent, 'body'> & {
-  body: S;
+    body: S;
 };
 export type TypedResponseBody<T> = Omit<APIGatewayProxyResult, 'body'> & {
-  body: T;
+    body: T;
 };
 
 export type ResponseTypedAPIGatewayProxyHandler<E, R> = Handler<E, R>;
