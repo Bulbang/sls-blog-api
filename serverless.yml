@@ -106,9 +106,6 @@ functions:
 
   auth:
     handler: src/lambdas/auth/handler.auth
-    environment:
-      LOGIN: admin
-      PASSWORD: qwerty123
 
 custom:
   TableName: ${self:service}-${self:provider.stage}-table
