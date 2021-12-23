@@ -24,7 +24,6 @@ functions:
     events:
       - http:
           method: get
-          cors: true
           path: /articles
           cors: true
     iamRoleStatements:
@@ -38,7 +37,6 @@ functions:
     events:
       - http:
           method: get
-          cors: true
           path: /articles/{id}
           cors: true
     iamRoleStatements:
@@ -52,7 +50,6 @@ functions:
     events:
       - http:
           path: /articles/create
-          cors: true
           method: post
           cors: true
           request:
@@ -74,7 +71,6 @@ functions:
     events:
       - http:
           method: put
-          cors: true
           path: /articles/{id}
           cors: true
           request:
@@ -139,7 +135,7 @@ resources:
           CorsRules:
             - AllowedMethods:
                 - GET
-                - PUT
+                - POST
               AllowedOrigins:
                 - "*"
 
